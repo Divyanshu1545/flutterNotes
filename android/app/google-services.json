@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "750394725557",
+    "project_id": "my-notes-app-65ac3",
+    "storage_bucket": "my-notes-app-65ac3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750394725557:android:79a2ccfcd987d25ebddafc",
+        "android_client_info": {
+          "package_name": "com.example.notes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750394725557-hjoqm3n6rsji4s2efqlivgg915ld0o3d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwCiOG4uvxGPvdweuPGZt2_sBYKV6XiiU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750394725557-hjoqm3n6rsji4s2efqlivgg915ld0o3d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "750394725557-rfccim2k9l0t4t0far0fqfoo2srvdvjc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.notes"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750394725557:android:d0ab9981596dcf22bddafc",
+        "android_client_info": {
+          "package_name": "com.example.notesappflutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750394725557-hjoqm3n6rsji4s2efqlivgg915ld0o3d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwCiOG4uvxGPvdweuPGZt2_sBYKV6XiiU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750394725557-hjoqm3n6rsji4s2efqlivgg915ld0o3d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "750394725557-rfccim2k9l0t4t0far0fqfoo2srvdvjc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.notes"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
