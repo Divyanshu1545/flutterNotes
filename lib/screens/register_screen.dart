@@ -78,14 +78,24 @@ class _RegisterViewState extends State<RegisterScreen> {
             Container(
               width: double.infinity,
               child: RawMaterialButton(
-                onPressed: () {
-                  final user = FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
-                          email: _email.text, password: _password.text);
+                onPressed: () async {
+                  try {
+                    final user = await FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
+                            email: _email.text, password: _password.text);
 
-                  print(user);
-                  FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: _email.text, password: _password.text);
+                    print(user);
+                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: _email.text, password: _password.text);
+                  } on Exception {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Something went wrong"),
+                      showCloseIcon: true,
+                      backgroundColor: Color.fromARGB(255, 164, 0, 0),
+                      closeIconColor: Colors.black,
+                      duration: Duration(seconds: 1),
+                    ));
+                  }
                 },
                 fillColor: accentColor,
                 elevation: 00,

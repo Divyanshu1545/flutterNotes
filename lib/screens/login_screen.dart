@@ -96,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("Invalid credentials"),
                       showCloseIcon: true,
-                      backgroundColor: Colors.red,
+                      backgroundColor: Color.fromARGB(255, 164, 0, 0),
                       closeIconColor: Colors.black,
                       duration: Duration(seconds: 1),
                     ));

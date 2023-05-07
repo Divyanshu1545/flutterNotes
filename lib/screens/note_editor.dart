@@ -88,6 +88,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             "color_id": colorId,
           }).then((value) {
             Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Note saved successfully"),
+              showCloseIcon: true,
+              backgroundColor: Color.fromARGB(255, 54, 145, 57),
+              closeIconColor: Colors.black,
+              duration: Duration(seconds: 1),
+            ));
           });
         },
         child: const Icon(Icons.save_as_rounded),

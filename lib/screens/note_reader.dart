@@ -37,10 +37,16 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
         actions: [
           IconButton(
             onPressed: () async {
-              await notesCollection
-                  .doc(widget.doc.id)
-                  .delete()
-                  .then((value) => Navigator.pop(context));
+             await notesCollection.doc(widget.doc.id).delete().then((value) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Note deleted successfully"),
+                  showCloseIcon: true,
+                  backgroundColor: Color.fromARGB(255, 164, 0, 0),
+                  closeIconColor: Colors.black,
+                  duration: Duration(seconds: 1),
+                ));
+                Navigator.pop(context);
+              });
             },
             icon: const Icon(Icons.delete_forever_outlined),
           ),
@@ -98,42 +104,18 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
               //   "note_content": _mainContentController.text,
               //   "color_id": colorId,
               .then((value) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Note saved successfully"),
+              showCloseIcon: true,
+              backgroundColor: Color.fromARGB(255, 54, 145, 57),
+              closeIconColor: Colors.black,
+              duration: Duration(seconds: 1),
+            ));
             Navigator.pop(context);
           });
         },
         child: const Icon(Icons.save_as_rounded),
       ),
     );
-
-    // return Scaffold(
-    //   backgroundColor: cardColors[colorId],
-    //   appBar: AppBar(
-    //     backgroundColor: cardColors[colorId],
-    //     elevation: 0,
-    //   ),
-    //   body: Padding(
-    //     padding: const EdgeInsets.all(16.0),
-    //     child: Column(
-    //       crossAxisAlignment: CrossAxisAlignment.start,
-    //       children: [
-    //         Text(
-    //           widget.doc["note_title"],
-    //           style: mainTitle,
-    //         ),
-    //         const SizedBox(height: 10),
-    //         Text(
-    //           widget.doc["creation_date"],
-    //           style: dateTitle,
-    //         ),
-    //         const SizedBox(height: 20),
-    //         Text(
-    //           widget.doc["note_content"],
-    //           style: mainContent,
-    //           overflow: TextOverflow.fade,
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }
