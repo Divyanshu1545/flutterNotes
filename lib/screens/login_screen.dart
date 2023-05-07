@@ -83,22 +83,23 @@ class _LoginScreenState extends State<LoginScreen> {
               child: RawMaterialButton(
                 onPressed: () async {
                   try {
-                    FirebaseAuth.instance
+                    await FirebaseAuth.instance
                         .signInWithEmailAndPassword(
                             email: _email.text, password: _password.text)
                         .then((value) => Navigator.popAndPushNamed(
                             context, homescreenRoute));
-                    user =await FirebaseAuth.instance.currentUser;
+                    user = FirebaseAuth.instance.currentUser;
 
                     userId = user?.uid as String;
                     devtools.log(userId);
                   } on FirebaseAuthException {
-                    Fluttertoast.showToast(
-                      toastLength: Toast.LENGTH_SHORT,
-                      backgroundColor: mainColor,
-                      textColor: Colors.white,
-                      msg: "Please enter valid credentials",
-                    );
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Invalid credentials"),
+                      showCloseIcon: true,
+                      backgroundColor: Colors.red,
+                      closeIconColor: Colors.black,
+                      duration: Duration(seconds: 1),
+                    ));
                   }
                 },
                 fillColor: accentColor,

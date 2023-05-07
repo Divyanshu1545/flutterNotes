@@ -24,7 +24,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    user = FirebaseAuth.instance.currentUser;
+    user = getUser();
+    if (user == null) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        loginRoute,
+        (_) => false,
+      );
+    }
     userId = user?.uid as String;
     devtools.log(user.toString());
     CollectionReference usersCollection =
@@ -46,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   final shouldLogout = await showLogOutDialog(context);
                   if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
-                    user = null;
+                    user = getUser();
                     userId = '';
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       loginRoute,

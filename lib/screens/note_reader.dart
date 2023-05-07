@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:notes/constants/format.dart';
@@ -43,7 +44,14 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
             },
             icon: const Icon(Icons.delete_forever_outlined),
           ),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.share_outlined))
+          IconButton(
+              onPressed: () async {
+                await FlutterShare.share(
+                    text:
+                        "${_titleController.text}: ${_mainContentController.text}",
+                    title: _titleController.text);
+              },
+              icon: const Icon(Icons.share_outlined))
         ],
       ),
       body: Padding(
@@ -55,7 +63,6 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
               style: GoogleFonts.roboto(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
-                
               ),
               controller: _titleController,
             ),
