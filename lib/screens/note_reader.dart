@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+
 import 'package:flutter_share/flutter_share.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -10,8 +10,8 @@ import 'package:notes/crud/collections_reference.dart';
 import 'package:notes/styles/app_style.dart';
 
 class NoteReaderScreen extends StatefulWidget {
-  NoteReaderScreen(this.doc, {super.key});
-  QueryDocumentSnapshot doc;
+  const NoteReaderScreen(this.doc, {super.key});
+  final QueryDocumentSnapshot doc;
 
   @override
   State<NoteReaderScreen> createState() => _NoteReaderScreenState();
@@ -37,7 +37,7 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
         actions: [
           IconButton(
             onPressed: () async {
-             await notesCollection.doc(widget.doc.id).delete().then((value) {
+              await notesCollection.doc(widget.doc.id).delete().then((value) {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text("Note deleted successfully"),
                   showCloseIcon: true,

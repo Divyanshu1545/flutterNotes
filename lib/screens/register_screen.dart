@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:notes/constants/routes.dart';
+import 'package:notes/utilities/snack_bar.dart';
 
 import '../styles/app_style.dart';
 
@@ -14,13 +15,27 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterScreen> {
+  bool isLoading = false;
+  Future<void> createUserWithEmailAndPassword(email, password) async {
+    setState(() {
+      isLoading = true;
+    });
+    await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  bool _isPasswordVisible = false;
+
   @override
   Widget build(BuildContext context) {
     TextEditingController _email = TextEditingController();
     TextEditingController _password = TextEditingController();
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login "),
+        title: const Text("Register"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -45,9 +60,16 @@ class _RegisterViewState extends State<RegisterScreen> {
             TextField(
               keyboardType: TextInputType.emailAddress,
               controller: _email,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: "User email",
-                prefixIcon: Icon(Icons.mail, color: Colors.black),
+                border: OutlineInputBorder(
+                  gapPadding: 4,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                prefixIcon: const Icon(
+                  Icons.mail,
+                  color: Colors.black,
+                ),
               ),
             ),
             const SizedBox(
@@ -56,9 +78,23 @@ class _RegisterViewState extends State<RegisterScreen> {
             TextField(
               obscureText: true,
               controller: _password,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: "User password",
-                prefixIcon: Icon(
+                border: OutlineInputBorder(
+                  gapPadding: 4,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(_isPasswordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                ),
+                prefixIcon: const Icon(
                   Icons.security,
                   color: Colors.black,
                 ),
@@ -80,21 +116,20 @@ class _RegisterViewState extends State<RegisterScreen> {
               child: RawMaterialButton(
                 onPressed: () async {
                   try {
-                    final user = await FirebaseAuth.instance
-                        .createUserWithEmailAndPassword(
-                            email: _email.text, password: _password.text);
-
-                    print(user);
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
-                        email: _email.text, password: _password.text);
-                  } on Exception {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("Something went wrong"),
-                      showCloseIcon: true,
-                      backgroundColor: Color.fromARGB(255, 164, 0, 0),
-                      closeIconColor: Colors.black,
-                      duration: Duration(seconds: 1),
-                    ));
+                    await createUserWithEmailAndPassword(
+                            _email.text, _password.text)
+                        .then((value) async {
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                          email: _email.text, password: _password.text);
+                      snackBar(context, "Registration Successful", "");
+                      Navigator.of(context).popAndPushNamed(homescreenRoute);
+                    });
+                  } on FirebaseAuthException {
+                    setState(() {
+                      isLoading = false;
+                    });
+                    snackBar(context, "Something went Wrong", 'red');
+                    build(context);
                   }
                 },
                 fillColor: accentColor,
@@ -102,10 +137,12 @@ class _RegisterViewState extends State<RegisterScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
-                child: const Text(
-                  "Register",
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
+                child: isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text(
+                        "Register",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
               ),
             )
           ],

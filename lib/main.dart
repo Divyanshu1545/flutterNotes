@@ -4,11 +4,13 @@ import 'package:notes/constants/routes.dart';
 import 'package:notes/screens/login_screen.dart';
 import 'package:notes/screens/register_screen.dart';
 import 'screens/home_screen.dart';
-import 'firebase_options.dart';import 'dart:developer' as devtools show log;
+import 'firebase_options.dart';
+import 'dart:developer' as devtools show log;
 
-Future<void> main() async {
+main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 

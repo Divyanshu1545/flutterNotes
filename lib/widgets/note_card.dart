@@ -19,7 +19,7 @@ Widget noteCard(Function()? onTap, QueryDocumentSnapshot doc) {
       margin: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: cardColors[doc["color_id"]],
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,6 +38,7 @@ Widget noteCard(Function()? onTap, QueryDocumentSnapshot doc) {
             doc["note_content"],
             style: mainContent,
             overflow: TextOverflow.fade,
+            maxLines: 4,
           ),
         ],
       ),
