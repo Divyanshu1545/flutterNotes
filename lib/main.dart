@@ -2,7 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:notes/constants/routes.dart';
 import 'package:notes/screens/login_screen.dart';
+
 import 'package:notes/screens/register_screen.dart';
+import 'package:notes/services/firebase_firestore_provider.dart';
 import 'screens/home_screen.dart';
 import 'firebase_options.dart';
 import 'dart:developer' as devtools show log;
@@ -11,6 +13,8 @@ main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseProvider.initializeFirebase();
+  devtools.log(FirebaseProvider.user.toString());
   runApp(const MyApp());
 }
 

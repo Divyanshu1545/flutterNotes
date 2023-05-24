@@ -7,9 +7,10 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:notes/constants/format.dart';
-import 'package:notes/crud/collections_reference.dart';
 import 'package:notes/styles/app_style.dart';
 import 'dart:developer' as devtools show log;
+
+import '../services/firebase_firestore_provider.dart';
 
 class NoteEditorScreen extends StatefulWidget {
   const NoteEditorScreen({super.key});
@@ -42,6 +43,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
+              textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Title',
@@ -63,6 +65,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               height: 15,
             ),
             TextField(
+              textCapitalization: TextCapitalization.sentences,
               controller: _mainContentController,
               style: mainContent,
               keyboardType: TextInputType.multiline,
@@ -77,15 +80,12 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await FirebaseFirestore.instance
-              .collection("user_collection")
-              .doc(userId)
-              .collection("Notes")
-              .add({
+          await FirebaseProvider.notesCollection.add({
             "note_title": _titleController.text,
             "creation_date": date,
             "note_content": _mainContentController.text,
             "color_id": colorId,
+            "is_pinned": false,
           }).then((value) {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

@@ -1,19 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notes/constants/routes.dart';
-import 'package:notes/crud/collections_reference.dart';
+
 import 'dart:developer' as devtools show log;
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:notes/firebase_options.dart';
 import 'package:notes/screens/login_screen.dart';
 import 'package:notes/screens/note_editor.dart';
 import 'package:notes/screens/note_reader.dart';
 import 'package:notes/styles/app_style.dart';
+import 'package:notes/utilities/add_a_task_dialog.dart';
+import 'package:notes/utilities/dialog_box.dart';
 import 'package:notes/widgets/note_card.dart';
 import 'package:notes/enums.dart';
+import 'package:notes/widgets/todo_tile.dart';
+
+import '../services/firebase_firestore_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,40 +32,41 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    Firebase.initializeApp();
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    user = getUser();
-    if (user == null) {
-      return const LoginScreen();
+    FirebaseProvider.initializeAllDb();
+    Stream<QuerySnapshot> unpinnedNotesStream = FirebaseProvider.notesCollection
+        .where("is_pinned", isEqualTo: false)
+        .snapshots();
+    Stream<QuerySnapshot> pinnedNotesStream = FirebaseProvider.notesCollection
+        .where("is_pinned", isEqualTo: true)
+        .snapshots();
+    Stream<QuerySnapshot> todoListStream =
+        FirebaseProvider.todoCollection.snapshots();
+
+    if (FirebaseProvider.user == null) {
+      return LoginScreen();
     } else {
-      userId = user?.uid as String;
-      devtools.log(user.toString());
-      CollectionReference usersCollection =
-          FirebaseFirestore.instance.collection("user_collection");
-
-      CollectionReference notesCollection =
-          usersCollection.doc(userId).collection("Notes");
-
-      Stream<QuerySnapshot> notesStream = notesCollection.snapshots();
-
+      devtools.log(FirebaseProvider.user!.uid.toString());
       return Scaffold(
-        backgroundColor: mainColor,
+        backgroundColor: const Color.fromARGB(204, 255, 255, 255),
         appBar: AppBar(
           actions: [
             PopupMenuButton(
               onSelected: (value) async {
                 switch (value) {
                   case MenuAction.logout:
-                    final shouldLogout = await showLogOutDialog(context);
+                    final shouldLogout = await showConfirmationDialog(
+                        context,
+                        "Sign out",
+                        "Are you sure you wanna say goodbye? :(",
+                        "Sign Out");
                     if (shouldLogout) {
-                      await FirebaseAuth.instance.signOut();
-                      user = getUser();
-                      userId = '';
+                      await FirebaseProvider.logoutUser();
+
                       Navigator.of(context).pushNamedAndRemoveUntil(
                         loginRoute,
                         (_) => false,
@@ -83,64 +91,176 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(height: 20),
-              Text("Recent Notes",
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "To Do List",
                   style: GoogleFonts.roboto(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 22)),
-              StreamBuilder<QuerySnapshot>(
-                stream: notesStream,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
+                      color: Colors.black,
+                      fontSize: 22),
+                  textAlign: TextAlign.center,
+                ),
+                Container(height: 15),
+                StreamBuilder<QuerySnapshot>(
+                  stream: todoListStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
 
-                  if (snapshot.hasData) {
-                    return Expanded(
-                      child: GridView(
+                    if (snapshot.hasData) {
+                      return ListView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: snapshot.data!.docs
+                            .map((todo) => TodoTile(
+                                  todo: todo,
+                                  isDone: todo['is_done'],
+                                ))
+                            .toList(),
+                      );
+                    } else {
+                      return Text(
+                        "You don't have any notes",
+                        style: GoogleFonts.nunito(
+                          color: Colors.white,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                Container(height: 15),
+                Text(
+                  "Pinned Notes",
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 22),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                StreamBuilder<QuerySnapshot>(
+                  stream: pinnedNotesStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    if (snapshot.hasData) {
+                      return GridView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                         ),
                         children: snapshot.data!.docs
-                            .map((note) => noteCard(() {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: ((context) =>
-                                              NoteReaderScreen(note))));
-                                }, note))
+                            .map((note) => noteCard(context, note))
                             .toList(),
-                      ),
-                    );
-                  }
-                  return Text(
-                    "You don't have any notes",
-                    style: GoogleFonts.nunito(
-                      color: Colors.white,
-                    ),
-                  );
-                },
-              )
-            ],
+                      );
+                    } else {
+                      return Text(
+                        "You don't have any notes",
+                        style: GoogleFonts.nunito(
+                          color: Colors.white,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "Recent Notes",
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 22),
+                  textAlign: TextAlign.center,
+                ),
+                StreamBuilder<QuerySnapshot>(
+                  stream: unpinnedNotesStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    if (snapshot.hasData) {
+                      return GridView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                        ),
+                        children: snapshot.data!.docs
+                            .map((note) => noteCard(context, note))
+                            .toList(),
+                      );
+                    } else {
+                      return Text(
+                        "You don't have any notes",
+                        style: GoogleFonts.nunito(
+                          color: Colors.white,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+              ],
+            ),
           ),
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: ((context) => const NoteEditorScreen())));
-          },
-          label: const Text("Add Note"),
-          icon: const Icon(Icons.add),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton.extended(
+              onPressed: () async {
+                FluidDialog(
+                  rootPage: FluidDialogPage(
+                      builder: (context) => Container(
+                            color: Colors.black,
+                          )),
+                );
+                await FirebaseProvider.todoCollection.add({
+                  "task": "",
+                  "is_done": false,
+                });
+              },
+              label: const Text("Add todo"),
+              icon: const Icon(Icons.list),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            FloatingActionButton.extended(
+              heroTag: Text("Note Button"),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: ((context) => const NoteEditorScreen())));
+              },
+              label: const Text("Add Note"),
+              icon: const Icon(Icons.note),
+            ),
+          ],
         ),
       );
     }
@@ -178,3 +298,30 @@ void initializeFirebase() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 }
+
+
+
+
+
+
+// void _showPopupMenu(BuildContext context) async {
+//   final selectedOption = await showMenu(
+//     context: context,
+//     position: const RelativeRect.fromLTRB(100, 200, 0, 0),
+//     items: [
+//       const PopupMenuItem(
+//         value: 1,
+//         child: Text('Option 1'),
+//       ),
+//       const PopupMenuItem(
+//         value: 2,
+//         child: Text('Option 2'),
+//       ),
+//       const PopupMenuItem(
+//         child: Text('Option 3'),
+//         value: 3,
+//       ),
+//     ],
+//     elevation: 8.0,
+//   );
+// }

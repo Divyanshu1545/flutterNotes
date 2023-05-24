@@ -13,8 +13,8 @@ List<Color> cardColors = [
   const Color.fromARGB(255, 171, 246, 148),
   const Color.fromARGB(255, 247, 153, 179),
   const Color.fromARGB(255, 241, 247, 143),
+  Color.fromARGB(255, 117, 185, 172),
   const Color.fromARGB(255, 245, 132, 132),
-  const Color.fromARGB(255, 144, 246, 226),
 ];
 
 //font styling

@@ -1,20 +1,15 @@
-import 'dart:ffi';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:notes/constants/routes.dart';
-import 'package:notes/crud/collections_reference.dart';
-import 'package:notes/screens/home_screen.dart';
+
 import 'package:notes/styles/app_style.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:notes/utilities/snack_bar.dart';
+
+import '../services/firebase_firestore_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,8 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
     });
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
+    await FirebaseProvider.loginUser(email, password);
     setState(() {
       _isLoading = false;
     });
@@ -137,10 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     loginWithEmailAndPassword(_email.text, _password.text).then(
                         (value) => Navigator.popAndPushNamed(
                             context, homescreenRoute));
-                    user = FirebaseAuth.instance.currentUser;
-
-                    userId = user?.uid as String;
-                    devtools.log(userId);
+                    FirebaseProvider.user = FirebaseProvider.getCurrentUser();
                   } on FirebaseAuthException {
                     snackBar(context, "Invalid Credentials", "red");
                   }
@@ -175,11 +166,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                     await FirebaseAuth.instance
                         .signInWithCredential(credential);
-                    user = FirebaseAuth.instance.currentUser;
+                    FirebaseProvider.user = FirebaseProvider.getCurrentUser();
                     Navigator.of(context).popAndPushNamed(homescreenRoute);
-                    devtools.log(user.toString());
-
-                    userId = user?.uid as String;
+                    devtools.log(FirebaseProvider.user.toString());
                   } on Exception catch (e) {
                     devtools.log(e.toString());
                     snackBar(context, "Invalid Credentials", "red");

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:notes/constants/routes.dart';
+import 'package:notes/services/firebase_firestore_provider.dart';
 import 'package:notes/utilities/snack_bar.dart';
 
 import '../styles/app_style.dart';
@@ -20,8 +21,7 @@ class _RegisterViewState extends State<RegisterScreen> {
     setState(() {
       isLoading = true;
     });
-    await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
+    await FirebaseProvider.createUser(email, password);
     setState(() {
       isLoading = false;
     });
