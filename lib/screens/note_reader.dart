@@ -23,7 +23,6 @@ class NoteReaderScreen extends StatefulWidget {
 class _NoteReaderScreenState extends State<NoteReaderScreen> {
   @override
   Widget build(BuildContext context) {
-    int colorId = widget.note["color_id"];
     bool isPinned = widget.note["is_pinned"];
 
     // ignore: no_leading_underscores_for_local_identifiers
@@ -32,11 +31,11 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
     // ignore: no_leading_underscores_for_local_identifiers
     final TextEditingController _mainContentController =
         TextEditingController(text: widget.note["note_content"]);
-    Color bgColor = cardColors[widget.note["color_id"]];
+
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: const Color.fromRGBO(243, 249, 210, 1),
       appBar: AppBar(
-        backgroundColor: cardColors[colorId],
+        backgroundColor: const Color.fromRGBO(243, 249, 210, 1),
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 00,
         actions: [
@@ -94,14 +93,16 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
               style: dateTitle,
             ),
             const SizedBox(height: 20),
-            TextField(
-              controller: _mainContentController,
-              style: mainContent,
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
+            Expanded(
+              child: TextField(
+                controller: _mainContentController,
+                style: mainContent,
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                ),
               ),
             )
           ],
@@ -114,7 +115,6 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
             "creation_date":
                 DateFormat(dateFormat).format(DateTime.now().toLocal()),
             "note_content": _mainContentController.text,
-            "color_id": colorId,
             "is_pinned": isPinned
           })
               // add({

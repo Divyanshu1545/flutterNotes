@@ -53,7 +53,8 @@ Widget noteCard(BuildContext context, QueryDocumentSnapshot note) {
       ],
     ),
     child: Card(
-      elevation: 10,
+      elevation: 5,
+      
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: GestureDetector(
         onTap: () {
@@ -66,7 +67,7 @@ Widget noteCard(BuildContext context, QueryDocumentSnapshot note) {
           width: double.infinity,
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
-            color: cardColors[note["color_id"]],
+            color: const Color.fromRGBO(243, 249, 210, 1),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(

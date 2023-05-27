@@ -152,53 +152,6 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 10,
             ),
-            Container(
-              width: double.infinity,
-              child: RawMaterialButton(
-                onPressed: () async {
-                  try {
-                    GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
-                    GoogleSignInAuthentication? gAuth =
-                        await gUser?.authentication;
-                    AuthCredential credential = GoogleAuthProvider.credential(
-                      accessToken: gAuth?.accessToken,
-                      idToken: gAuth?.idToken,
-                    );
-                    await FirebaseAuth.instance
-                        .signInWithCredential(credential);
-                    FirebaseProvider.user = FirebaseProvider.getCurrentUser();
-                    Navigator.of(context).popAndPushNamed(homescreenRoute);
-                    devtools.log(FirebaseProvider.user.toString());
-                  } on Exception catch (e) {
-                    devtools.log(e.toString());
-                    snackBar(context, "Invalid Credentials", "red");
-                  }
-                },
-                fillColor: accentColor,
-                elevation: 00,
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/google.svg',
-                      height: 25,
-                      width: 25,
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    const Text(
-                      "Sign in with google",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-            )
           ],
         ),
       ),

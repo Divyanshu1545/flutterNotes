@@ -20,7 +20,6 @@ class TodoTile extends StatefulWidget {
 }
 
 class _TodoTileState extends State<TodoTile> {
-  
   TextEditingController todoController = TextEditingController();
   @override
   void initState() {
@@ -78,7 +77,7 @@ class _TodoTileState extends State<TodoTile> {
             decoration: BoxDecoration(
               color: widget.isDone
                   ? const Color.fromARGB(255, 92, 215, 96)
-                  : const Color.fromARGB(255, 231, 209, 12),
+                  : const Color.fromRGBO(189, 180, 178, 1),
               borderRadius: BorderRadius.circular(15),
             ),
             child: TextField(
